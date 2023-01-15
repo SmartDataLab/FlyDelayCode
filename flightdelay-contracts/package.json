@@ -1,0 +1,61 @@
+{
+  "name": "@etherisc/flightdelay-contracts",
+  "version": "1.1.42",
+  "description": "Etherisc FlightDelay Contracts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/etherisc/GIF.git"
+  },
+  "license": "Apache-2.0",
+  "settings": {
+    "solc": "0.7.6"
+  },
+  "files": [
+    "contracts/*"
+  ],
+  "oclif": {
+    "commands": "./bin/commands"
+  },
+  "scripts": {
+    "clean": "echo 'Clean repository'; rimraf build coverage",
+    "compile": "echo 'Compile contracts'; truffle compile",
+    "console": "echo 'Open truffle console'; truffle console",
+    "coverage": "echo 'Run coverage'; solidity-coverage",
+    "debug": "echo 'Start truffle debugger'; truffle debug",
+    "develop": "echo 'Open truffle console for development network'; truffle develop",
+    "docs": "echo 'Generage documentation'; rimraf ./docs/* && SOLC_ARGS='openzeppelin-solidity=$(pwd)/node_modules/openzeppelin-solidity' solidity-docgen . contracts .",
+    "lint": "echo 'Lint contracts'; solhint \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"contracts/**/*.sol\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"",
+    "migrate": "echo 'Deploy contracts'; truffle migrate",
+    "migrate:prod": "truffle migrate --verbose-rpc --network ${NETWORK}",
+    "migrate:reset": "echo 'Deploy contracts'; truffle migrate --reset",
+    "migrate:reset:prod": "truffle migrate --reset --verbose-rpc --network ${NETWORK}",
+    "networks": "echo 'Show addresses for deployed contracts on each network'; truffle networks",
+    "prettier": "prettier --write contracts/**/*.sol",
+    "test": "echo 'Test contracts'; truffle test"
+  },
+  "dependencies": {
+    "@babel/eslint-parser": "^7.16.3",
+    "@etherisc/gif-connect": "^1.0.6",
+    "@etherisc/gif-interface": "^1.1.43",
+    "@etherisc/gif-tools": "^0.1.6",
+    "@truffle/hdwallet-provider": "^1.0.37",
+    "@uniswap/lib": "^4.0.1-alpha",
+    "axios": "^0.24.0",
+    "dotenv": "^8.2.0",
+    "openzeppelin-solidity": "^3.4.2",
+    "prettier": "^1.19.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.2",
+    "rimraf": "^2.7.1",
+    "solidity-coverage": "git+https://github.com/kandrianov/solidity-coverage.git",
+    "solidity-docgen": "^0.5.11",
+    "truffle-flattener": "^1.5.0",
+    "truffle-source-verify": "0.0.6"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb": "^19.0.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.27.0",
+    "eslint-plugin-react-hooks": "^4.3.0"
+  }
+}
