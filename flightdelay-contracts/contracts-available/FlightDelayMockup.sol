@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: Apache 2.0
 pragma solidity 0.6.11;
 
+
+// Mockup主要功能：
+// 1. xxx
 import "@etherisc/gif-interface/contracts/services/InstanceOperatorService.sol";
 import "@etherisc/gif-interface/contracts/Product.sol";
 
 contract FlightDelayMockup is Product {
-
+    // 合约主要功能
     event LogAppliedForPolicy(
         bytes32 _carrierFlightNumber,
+        // 字段什么意思
         bytes32 _departureYearMonthDay,
         uint256 _departureTime,
         uint256 _arrivalTime,
