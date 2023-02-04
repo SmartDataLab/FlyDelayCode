@@ -22,15 +22,15 @@ contract FlightDelayChainlink is Product {
 
     bytes32 public constant POLICY_FLOW = "PolicyFlowDefault";
 
-    // Minimum observations for valid prediction
+    // Minimum observations for valid prediction 有效预测的最小观测值，10s
     uint256 public constant MIN_OBSERVATIONS = 10;
-    // Minimum time before departure for applying
+    // Minimum time before departure for applying 至少在起飞14天前申请
     uint256 public constant MIN_TIME_BEFORE_DEPARTURE = 14 * 24 hours;
-    // Maximum time before departure for applying
+    // Maximum time before departure for applying 最多在起飞前90天申请
     uint256 public constant MAX_TIME_BEFORE_DEPARTURE = 90 * 24 hours;
-    // Maximum duration of flight
+    // Maximum duration of flight 飞机最长飞行时间2天
     uint256 public constant MAX_FLIGHT_DURATION = 2 days;
-    // Check for delay after .. minutes after scheduled arrival
+    // Check for delay after .. minutes after scheduled arrival 在预计到达时间的1h后，检查飞机是否延迟
     uint256 public constant CHECK_OFFSET = 1 hours;
 
     // uint256 public constant MIN_PREMIUM = 15 * 10 ** 18; // production
@@ -48,23 +48,24 @@ contract FlightDelayChainlink is Product {
 
     // Maximum cumulated weighted premium per risk
     uint256 public constant MAX_TOTAL_PAYOUT = 3 * MAX_PAYOUT; // Maximum risk per flight is 3x max payout.
-
+    
+    // 风险结构体
     struct Risk {
         bytes32 carrierFlightNumber;
         bytes32 departureYearMonthDay;
         uint256 departureTime;
         uint256 arrivalTime;
-        uint delayInMinutes;
+        uint delayInMinutes; // 延迟时间
         uint8 delay;
-        uint256 estimatedMaxTotalPayout;
-        uint256 premiumMultiplier;
+        uint256 estimatedMaxTotalPayout; //估计的最大赔付
+        uint256 premiumMultiplier; 
         uint256 weight;
     }
 
-    mapping(bytes32 => Risk) public risks;
+    mapping(bytes32 => Risk) public risks; // 风险
     mapping(bytes32 => address) public bpKeyToAddress;
-    mapping(address => bytes32[]) public addressToBpKeys;
-    mapping(address => uint256) public addressToPolicyCount;
+    mapping(address => bytes32[]) public addressToBpKeys; // 保单BpKeys
+    mapping(address => uint256) public addressToPolicyCount; // 保单计数
 
     uint256 public uniqueIndex;
     bytes32 public ratingsOracleType;
@@ -84,6 +85,7 @@ contract FlightDelayChainlink is Product {
         setOracles(_ratingsOracleType, _ratingsOracleId, _statusesOracleType, _statusesOracleId);
     }
 
+    // 初始化Oracle
     function setOracles(
         bytes32 _ratingsOracleType,
         uint256 _ratingsOracleId,
@@ -98,7 +100,8 @@ contract FlightDelayChainlink is Product {
         statusesOracleType = _statusesOracleType;
         statusesOracleId = _statusesOracleId;
     }
-
+    
+    // 根据地址，生成唯一id：BpKey
     function uniqueId(address _addr)
         internal
         returns (bytes32 _uniqueId)
@@ -106,11 +109,13 @@ contract FlightDelayChainlink is Product {
         uniqueIndex += 1;
         return keccak256(abi.encode(_addr, productId, uniqueIndex));
     }
-
+    
+    // 内部函数，获取合约当前可用token
     function getValue() internal returns(uint256) {
         return msg.value;
     }
-
+    
+    // 投保
     function applyForPolicy(
         // domain specific
         bytes32 _carrierFlightNumber,
@@ -120,10 +125,10 @@ contract FlightDelayChainlink is Product {
         uint256[5] memory _payouts
     ) external payable {
         // Validate input parameters
-
+        
         uint256 premium = getValue();
         bytes32 bpKey = uniqueId(msg.sender);
-
+        // 验证当前账号保费额度
         require(premium >= MIN_PREMIUM, "ERROR:FDD-001:INVALID_PREMIUM");
         require(premium <= MAX_PREMIUM, "ERROR:FDD-002:INVALID_PREMIUM");
         require(_arrivalTime > _departureTime, "ERROR:FDD-003:ARRIVAL_BEFORE_DEPARTURE_TIME");
@@ -141,6 +146,8 @@ contract FlightDelayChainlink is Product {
             "ERROR:FDD-005:INVALID_ARRIVAL/DEPARTURE_TIME"
         );
 
+
+
         // Create risk if not exists
         bytes32 riskId = keccak256(abi.encode(_carrierFlightNumber, _departureTime, _arrivalTime));
         Risk storage risk = risks[riskId];
@@ -151,7 +158,8 @@ contract FlightDelayChainlink is Product {
             risk.departureTime = _departureTime;
             risk.arrivalTime = _arrivalTime;
         }
-
+        
+        // 这些参数设置在哪设置的？可能后面Oracle可以得到？？
         require (
             premium * risk.premiumMultiplier + risk.estimatedMaxTotalPayout < MAX_TOTAL_PAYOUT,
             "ERROR:FDD-006:CLUSTER_RISK"
