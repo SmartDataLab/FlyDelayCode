@@ -116,6 +116,10 @@ contract FlightDelayChainlink is Product {
     }
     
     // 投保
+    // 这里为什么FlightDelayChainlink.sol、FlightDelayEtheriscOracle.sol、FlightDelayOraclizeOracle.sol、FlightDelayMockup.sol都要定义投保函数
+    // 不应该定义一个就可以了？
+    // 包括后面的Risk结构体、还有一些其他函数，FlightDelayChainlink.sol、FlightDelayEtheriscOracle.sol、FlightDelayOraclizeOracle.sol都定义了，每个只有些微差距。
+    // 这几个文件之间有什么联系
     function applyForPolicy(
         // domain specific
         bytes32 _carrierFlightNumber,
